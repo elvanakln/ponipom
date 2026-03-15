@@ -12,94 +12,174 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
+        final theme = Theme.of(context);
+
         return SafeArea(
           child: ListView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
             children: [
-              const SizedBox(height: 8),
+              // ── Başlık ──
               Text(
                 'Ayarlar',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Uygulamayı kişiselleştir',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // ═══ Tema ═══
+              _SettingsSection(
+                title: 'Görünüm',
+                icon: Icons.palette_outlined,
+                theme: theme,
+                children: [
+                  const SizedBox(height: 14),
+                  _ThemeSelector(
+                    current: settings.themeMode,
+                    onChanged: (mode) => settings.update(themeMode: mode),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Sayaç Stili',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-              ),
-              const SizedBox(height: 24),
-
-              _SectionTitle('Tema'),
-              const SizedBox(height: 12),
-              _ThemeSelector(
-                current: settings.themeMode,
-                onChanged: (mode) => settings.update(themeMode: mode),
-              ),
-
-              const SizedBox(height: 24),
-
-              _SectionTitle('Sayaç Görünümü'),
-              const SizedBox(height: 12),
-              _DisplayStyleSelector(
-                current: settings.timerDisplayStyle,
-                onChanged: (style) =>
-                    settings.update(timerDisplayStyle: style),
+                  ),
+                  const SizedBox(height: 10),
+                  _DisplayStyleSelector(
+                    current: settings.timerDisplayStyle,
+                    onChanged: (style) =>
+                        settings.update(timerDisplayStyle: style),
+                  ),
+                ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-              _SectionTitle('Süre Ayarları'),
-              const SizedBox(height: 8),
-              _DurationTile(
-                title: 'Odaklanma',
-                value: settings.focusDuration,
-                min: 1,
-                max: 90,
-                onChanged: (v) {
-                  settings.update(focusDuration: v);
-                  _syncTimer(context);
-                },
-              ),
-              _DurationTile(
-                title: 'Kısa Mola',
-                value: settings.shortBreak,
-                min: 1,
-                max: 30,
-                onChanged: (v) {
-                  settings.update(shortBreak: v);
-                  _syncTimer(context);
-                },
-              ),
-              _DurationTile(
-                title: 'Uzun Mola',
-                value: settings.longBreak,
-                min: 1,
-                max: 60,
-                onChanged: (v) {
-                  settings.update(longBreak: v);
-                  _syncTimer(context);
-                },
-              ),
-              _DurationTile(
-                title: 'Uzun Mola Aralığı',
-                value: settings.longBreakInterval,
-                min: 2,
-                max: 8,
-                suffix: 'oturum',
-                onChanged: (v) {
-                  settings.update(longBreakInterval: v);
-                  _syncTimer(context);
-                },
+              // ═══ Süreler ═══
+              _SettingsSection(
+                title: 'Süre Ayarları',
+                icon: Icons.timer_outlined,
+                theme: theme,
+                children: [
+                  const SizedBox(height: 8),
+                  _DurationTile(
+                    title: 'Odaklanma',
+                    icon: Icons.center_focus_strong_rounded,
+                    value: settings.focusDuration,
+                    min: 1,
+                    max: 90,
+                    color: const Color(0xFFE53935),
+                    onChanged: (v) {
+                      settings.update(focusDuration: v);
+                      _syncTimer(context);
+                    },
+                    theme: theme,
+                  ),
+                  _DurationTile(
+                    title: 'Kısa Mola',
+                    icon: Icons.coffee_rounded,
+                    value: settings.shortBreak,
+                    min: 1,
+                    max: 30,
+                    color: const Color(0xFF43A047),
+                    onChanged: (v) {
+                      settings.update(shortBreak: v);
+                      _syncTimer(context);
+                    },
+                    theme: theme,
+                  ),
+                  _DurationTile(
+                    title: 'Uzun Mola',
+                    icon: Icons.self_improvement_rounded,
+                    value: settings.longBreak,
+                    min: 1,
+                    max: 60,
+                    color: const Color(0xFF1E88E5),
+                    onChanged: (v) {
+                      settings.update(longBreak: v);
+                      _syncTimer(context);
+                    },
+                    theme: theme,
+                  ),
+                  _DurationTile(
+                    title: 'Uzun Mola Aralığı',
+                    icon: Icons.repeat_rounded,
+                    value: settings.longBreakInterval,
+                    min: 2,
+                    max: 8,
+                    suffix: 'oturum',
+                    color: const Color(0xFF8E24AA),
+                    onChanged: (v) {
+                      settings.update(longBreakInterval: v);
+                      _syncTimer(context);
+                    },
+                    theme: theme,
+                  ),
+                ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-              _SectionTitle('Davranış'),
-              const SizedBox(height: 8),
-              SwitchListTile(
-                title: const Text('Otomatik başlat'),
-                subtitle: const Text('Sonraki oturumu otomatik başlat'),
-                value: settings.autoStart,
-                onChanged: (v) {
-                  settings.update(autoStart: v);
-                  _syncTimer(context);
-                },
+              // ═══ Davranış ═══
+              _SettingsSection(
+                title: 'Davranış',
+                icon: Icons.tune_rounded,
+                theme: theme,
+                children: [
+                  const SizedBox(height: 4),
+                  _ToggleTile(
+                    title: 'Otomatik başlat',
+                    subtitle: 'Sonraki oturumu otomatik başlat',
+                    icon: Icons.play_circle_outline_rounded,
+                    value: settings.autoStart,
+                    onChanged: (v) {
+                      settings.update(autoStart: v);
+                      _syncTimer(context);
+                    },
+                    theme: theme,
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 32),
+
+              // ── Uygulama bilgisi ──
+              Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'PomoLocal',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color:
+                            theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Sıfır Sunucu, Tam Gizlilik, Maksimum Odak.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color:
+                            theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -117,6 +197,74 @@ class SettingsScreen extends StatelessWidget {
           longBreakInterval: settings.longBreakInterval,
           autoStart: settings.autoStart,
         );
+  }
+}
+
+// ═══════════════════════════════════════
+// Ayarlar Bölüm Kartı
+// ═══════════════════════════════════════
+
+class _SettingsSection extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final ThemeData theme;
+  final List<Widget> children;
+
+  const _SettingsSection({
+    required this.title,
+    required this.icon,
+    required this.theme,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 18, color: theme.colorScheme.primary),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
+          ),
+          ...children,
+        ],
+      ),
+    );
   }
 }
 
@@ -187,10 +335,10 @@ class _ThemeChip extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isSelected
                   ? Theme.of(context).colorScheme.primary
@@ -200,9 +348,9 @@ class _ThemeChip extends StatelessWidget {
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: color.withOpacity(0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      color: color.withOpacity(0.5),
+                      blurRadius: 12,
+                      offset: const Offset(0, 3),
                     )
                   ]
                 : null,
@@ -210,14 +358,14 @@ class _ThemeChip extends StatelessWidget {
           child: Column(
             children: [
               Icon(icon, color: textColor, size: 22),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
                 label,
                 style: TextStyle(
                   color: textColor,
                   fontSize: 13,
-                  fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                  letterSpacing: 0.3,
                 ),
               ),
             ],
@@ -267,14 +415,14 @@ class _DisplayStyleSelector extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
             color: isSelected
-                ? theme.colorScheme.primaryContainer
-                : theme.colorScheme.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(12),
+                ? theme.colorScheme.primaryContainer.withOpacity(0.6)
+                : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary
-                  : Colors.transparent,
-              width: 2,
+                  : theme.colorScheme.outlineVariant.withOpacity(0.2),
+              width: isSelected ? 2 : 1,
             ),
           ),
           child: Column(
@@ -282,18 +430,17 @@ class _DisplayStyleSelector extends StatelessWidget {
               Icon(icon,
                   color: isSelected
                       ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurfaceVariant,
+                      : theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
                   size: 22),
               const SizedBox(height: 6),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   color: isSelected
                       ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurfaceVariant,
+                      : theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
                 ),
               ),
             ],
@@ -304,69 +451,199 @@ class _DisplayStyleSelector extends StatelessWidget {
   }
 }
 
-// ── Bölüm Başlığı ──
+// ── Süre Ayarı ──
 
-class _SectionTitle extends StatelessWidget {
+class _DurationTile extends StatelessWidget {
   final String title;
-  const _SectionTitle(this.title);
+  final IconData icon;
+  final int value;
+  final int min;
+  final int max;
+  final String suffix;
+  final Color color;
+  final ValueChanged<int> onChanged;
+  final ThemeData theme;
+
+  const _DurationTile({
+    required this.title,
+    required this.icon,
+    required this.value,
+    required this.min,
+    required this.max,
+    this.suffix = 'dk',
+    required this.color,
+    required this.onChanged,
+    required this.theme,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.primary,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: color),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ),
+          // Stepper
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _MiniStepperBtn(
+                  icon: Icons.remove_rounded,
+                  enabled: value > min,
+                  onTap: () => onChanged(value - 1),
+                  theme: theme,
+                ),
+                SizedBox(
+                  width: 56,
+                  child: Text(
+                    '$value $suffix',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                _MiniStepperBtn(
+                  icon: Icons.add_rounded,
+                  enabled: value < max,
+                  onTap: () => onChanged(value + 1),
+                  theme: theme,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ── Süre Ayarı ──
+class _MiniStepperBtn extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+  final ThemeData theme;
 
-class _DurationTile extends StatelessWidget {
-  final String title;
-  final int value;
-  final int min;
-  final int max;
-  final String suffix;
-  final ValueChanged<int> onChanged;
-
-  const _DurationTile({
-    required this.title,
-    required this.value,
-    required this.min,
-    required this.max,
-    this.suffix = 'dk',
-    required this.onChanged,
+  const _MiniStepperBtn({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+    required this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.remove_circle_outline),
-            onPressed: value > min ? () => onChanged(value - 1) : null,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
           ),
-          SizedBox(
-            width: 64,
-            child: Text(
-              '$value $suffix',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: enabled
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurfaceVariant.withOpacity(0.2),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Toggle Tile ──
+
+class _ToggleTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final ThemeData theme;
+
+  const _ToggleTile({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.value,
+    required this.onChanged,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: theme.colorScheme.primary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                  ),
+                ),
+              ],
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            onPressed: value < max ? () => onChanged(value + 1) : null,
+          Switch(
+            value: value,
+            onChanged: onChanged,
           ),
         ],
       ),

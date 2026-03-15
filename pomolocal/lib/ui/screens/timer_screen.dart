@@ -30,7 +30,7 @@ class TimerScreen extends StatelessWidget {
               // Aktif görev bilgisi
               if (activeTask != null) _ActiveTaskBadge(task: activeTask),
 
-              // Pomodoro noktaları (görev varsa görev hedefine göre)
+              // Pomodoro noktaları
               _PomodoroDotsRow(
                 timer: timer,
                 activeTask: activeTask,
@@ -98,44 +98,75 @@ class _ActiveTaskBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color =
-        task.taskColor != null ? Color(task.taskColor!) : theme.colorScheme.primary;
+    final color = task.taskColor != null
+        ? Color(task.taskColor!)
+        : theme.colorScheme.primary;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        gradient: LinearGradient(
+          colors: [
+            color.withOpacity(0.15),
+            color.withOpacity(0.08),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: color.withOpacity(0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.4),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Flexible(
             child: Text(
               task.title,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
                 color: theme.colorScheme.onSurface,
+                letterSpacing: -0.2,
               ),
             ),
           ),
           if (task.focusDuration > 0) ...[
-            const SizedBox(width: 8),
-            Text(
-              '${task.focusDuration}dk',
-              style: TextStyle(
-                fontSize: 12,
-                color: theme.colorScheme.onSurfaceVariant,
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${task.focusDuration}dk',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
               ),
             ),
           ],
@@ -145,7 +176,7 @@ class _ActiveTaskBadge extends StatelessWidget {
   }
 }
 
-/// Pomodoro noktaları — görev varsa hedef sayısına göre
+/// Pomodoro noktaları
 class _PomodoroDotsRow extends StatelessWidget {
   final TimerProvider timer;
   final Task? activeTask;
@@ -159,11 +190,10 @@ class _PomodoroDotsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final total = activeTask?.pomodorosTarget ?? 4;
     final spent = activeTask?.pomodorosSpent ?? (timer.completedPomodoros % 4);
     final color = taskColor ?? timer.currentColor;
-
-    // Çok fazla nokta olmasın, max 10
     final displayTotal = total > 10 ? 10 : total;
 
     return Column(
@@ -173,29 +203,41 @@ class _PomodoroDotsRow extends StatelessWidget {
           children: List.generate(displayTotal, (i) {
             final filled = i < spent;
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: Container(
-                width: 10,
-                height: 10,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                width: filled ? 12 : 10,
+                height: filled ? 12 : 10,
                 decoration: BoxDecoration(
-                  color: filled ? color : color.withOpacity(0.2),
+                  color: filled ? color : Colors.transparent,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: color.withOpacity(0.4),
-                    width: 1,
+                    color: filled ? color : color.withOpacity(0.3),
+                    width: 2,
                   ),
+                  boxShadow: filled
+                      ? [
+                          BoxShadow(
+                            color: color.withOpacity(0.4),
+                            blurRadius: 6,
+                          ),
+                        ]
+                      : null,
                 ),
               ),
             );
           }),
         ),
         if (activeTask != null) ...[
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             '$spent / $total pomodoro',
             style: TextStyle(
               fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+              letterSpacing: 0.5,
             ),
           ),
         ],
