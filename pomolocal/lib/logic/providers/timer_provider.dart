@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pomolocal/core/constants.dart';
 import 'package:pomolocal/core/enums.dart';
 import 'package:pomolocal/data/models/session_model.dart';
+import 'package:pomolocal/data/models/task_model.dart';
 import 'package:pomolocal/data/repositories/session_repository.dart';
 import 'package:pomolocal/logic/timer_service.dart';
 
@@ -19,6 +20,12 @@ class TimerProvider extends ChangeNotifier {
   int _longBreakInterval = AppConstants.defaultLongBreakInterval;
   bool _autoStart = false;
 
+  // Aktif görevin kendi süreleri (0 = genel ayarı kullan)
+  int _taskFocusDuration = 0;
+  int _taskShortBreak = 0;
+
+  VoidCallback? onFocusComplete;
+
   TimerProvider(this._sessionRepository) {
     _timerService = TimerService(
       onTick: () => notifyListeners(),
@@ -29,15 +36,21 @@ class TimerProvider extends ChangeNotifier {
   TimerState get state => _state;
   SessionType get sessionType => _sessionType;
   int get completedPomodoros => _completedPomodoros;
-
   int get remainingSeconds => _timerService.remainingSeconds;
+
+  /// Aktif odak süresi (görev özel veya genel)
+  int get effectiveFocusDuration =>
+      _taskFocusDuration > 0 ? _taskFocusDuration : _focusDuration;
+
+  int get effectiveShortBreak =>
+      _taskShortBreak > 0 ? _taskShortBreak : _shortBreak;
 
   int get totalSeconds {
     switch (_sessionType) {
       case SessionType.focus:
-        return _focusDuration * 60;
+        return effectiveFocusDuration * 60;
       case SessionType.shortBreak:
-        return _shortBreak * 60;
+        return effectiveShortBreak * 60;
       case SessionType.longBreak:
         return _longBreak * 60;
     }
@@ -96,6 +109,15 @@ class TimerProvider extends ChangeNotifier {
     }
   }
 
+  /// Aktif görev değiştiğinde çağrılır
+  void setActiveTaskDurations(Task? task) {
+    _taskFocusDuration = task?.focusDuration ?? 0;
+    _taskShortBreak = task?.shortBreak ?? 0;
+    if (_state == TimerState.idle) {
+      notifyListeners();
+    }
+  }
+
   void start() {
     final duration = _getDurationForType(_sessionType);
     _timerService.start(duration);
@@ -130,7 +152,6 @@ class TimerProvider extends ChangeNotifier {
   void _onTimerComplete() {
     final completedType = _sessionType;
 
-    // Save completed session
     final session = Session(
       startTime: DateTime.now().subtract(
         Duration(minutes: _getDurationForType(completedType)),
@@ -143,6 +164,7 @@ class TimerProvider extends ChangeNotifier {
 
     if (completedType == SessionType.focus) {
       _completedPomodoros++;
+      onFocusComplete?.call();
     }
 
     _moveToNextSession();
@@ -171,9 +193,9 @@ class TimerProvider extends ChangeNotifier {
   int _getDurationForType(SessionType type) {
     switch (type) {
       case SessionType.focus:
-        return _focusDuration;
+        return effectiveFocusDuration;
       case SessionType.shortBreak:
-        return _shortBreak;
+        return effectiveShortBreak;
       case SessionType.longBreak:
         return _longBreak;
     }

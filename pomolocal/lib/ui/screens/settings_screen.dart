@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pomolocal/core/enums.dart';
+import 'package:pomolocal/core/theme.dart';
 import 'package:pomolocal/logic/providers/settings_provider.dart';
 import 'package:pomolocal/logic/providers/timer_provider.dart';
 
@@ -16,18 +18,36 @@ class SettingsScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 8),
               Text(
-                'Settings',
+                'Ayarlar',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 24),
 
-              // Timer durations
-              _SectionTitle('Timer Durations'),
+              _SectionTitle('Tema'),
+              const SizedBox(height: 12),
+              _ThemeSelector(
+                current: settings.themeMode,
+                onChanged: (mode) => settings.update(themeMode: mode),
+              ),
+
+              const SizedBox(height: 24),
+
+              _SectionTitle('Sayaç Görünümü'),
+              const SizedBox(height: 12),
+              _DisplayStyleSelector(
+                current: settings.timerDisplayStyle,
+                onChanged: (style) =>
+                    settings.update(timerDisplayStyle: style),
+              ),
+
+              const SizedBox(height: 24),
+
+              _SectionTitle('Süre Ayarları'),
               const SizedBox(height: 8),
               _DurationTile(
-                title: 'Focus',
+                title: 'Odaklanma',
                 value: settings.focusDuration,
                 min: 1,
                 max: 90,
@@ -37,7 +57,7 @@ class SettingsScreen extends StatelessWidget {
                 },
               ),
               _DurationTile(
-                title: 'Short Break',
+                title: 'Kısa Mola',
                 value: settings.shortBreak,
                 min: 1,
                 max: 30,
@@ -47,7 +67,7 @@ class SettingsScreen extends StatelessWidget {
                 },
               ),
               _DurationTile(
-                title: 'Long Break',
+                title: 'Uzun Mola',
                 value: settings.longBreak,
                 min: 1,
                 max: 60,
@@ -57,11 +77,11 @@ class SettingsScreen extends StatelessWidget {
                 },
               ),
               _DurationTile(
-                title: 'Long Break Interval',
+                title: 'Uzun Mola Aralığı',
                 value: settings.longBreakInterval,
                 min: 2,
                 max: 8,
-                suffix: 'sessions',
+                suffix: 'oturum',
                 onChanged: (v) {
                   settings.update(longBreakInterval: v);
                   _syncTimer(context);
@@ -70,12 +90,11 @@ class SettingsScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Behavior
-              _SectionTitle('Behavior'),
+              _SectionTitle('Davranış'),
               const SizedBox(height: 8),
               SwitchListTile(
-                title: const Text('Auto-start next session'),
-                subtitle: const Text('Automatically start the next timer'),
+                title: const Text('Otomatik başlat'),
+                subtitle: const Text('Sonraki oturumu otomatik başlat'),
                 value: settings.autoStart,
                 onChanged: (v) {
                   settings.update(autoStart: v);
@@ -101,6 +120,192 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
+// ── Tema Seçici ──
+
+class _ThemeSelector extends StatelessWidget {
+  final AppThemeMode current;
+  final ValueChanged<AppThemeMode> onChanged;
+
+  const _ThemeSelector({required this.current, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _ThemeChip(
+          label: 'Açık',
+          icon: Icons.light_mode_rounded,
+          color: const Color(0xFFFAF8F5),
+          textColor: Colors.black87,
+          isSelected: current == AppThemeMode.light,
+          onTap: () => onChanged(AppThemeMode.light),
+        ),
+        const SizedBox(width: 10),
+        _ThemeChip(
+          label: 'Koyu',
+          icon: Icons.dark_mode_rounded,
+          color: const Color(0xFF1A1A1A),
+          textColor: Colors.white,
+          isSelected: current == AppThemeMode.dark,
+          onTap: () => onChanged(AppThemeMode.dark),
+        ),
+        const SizedBox(width: 10),
+        _ThemeChip(
+          label: 'Pembe',
+          icon: Icons.favorite_rounded,
+          color: const Color(0xFFE91E63),
+          textColor: Colors.white,
+          isSelected: current == AppThemeMode.pink,
+          onTap: () => onChanged(AppThemeMode.pink),
+        ),
+      ],
+    );
+  }
+}
+
+class _ThemeChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final Color textColor;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ThemeChip({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.textColor,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.transparent,
+              width: 2.5,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: color.withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    )
+                  ]
+                : null,
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: textColor, size: 22),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 13,
+                  fontWeight:
+                      isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Görünüm Seçici ──
+
+class _DisplayStyleSelector extends StatelessWidget {
+  final TimerDisplayStyle current;
+  final ValueChanged<TimerDisplayStyle> onChanged;
+
+  const _DisplayStyleSelector({
+    required this.current,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        _styleOption(theme, 'Halka', Icons.radio_button_unchecked,
+            TimerDisplayStyle.circular),
+        const SizedBox(width: 10),
+        _styleOption(theme, 'Yaprak', Icons.calendar_today_rounded,
+            TimerDisplayStyle.calendar),
+        const SizedBox(width: 10),
+        _styleOption(theme, 'Minimal', Icons.text_fields_rounded,
+            TimerDisplayStyle.minimal),
+      ],
+    );
+  }
+
+  Widget _styleOption(
+      ThemeData theme, String label, IconData icon, TimerDisplayStyle style) {
+    final isSelected = current == style;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onChanged(style),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? theme.colorScheme.primaryContainer
+                : theme.colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : Colors.transparent,
+              width: 2,
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(icon,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                  size: 22),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight:
+                      isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Bölüm Başlığı ──
+
 class _SectionTitle extends StatelessWidget {
   final String title;
   const _SectionTitle(this.title);
@@ -118,6 +323,8 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
+// ── Süre Ayarı ──
+
 class _DurationTile extends StatelessWidget {
   final String title;
   final int value;
@@ -131,7 +338,7 @@ class _DurationTile extends StatelessWidget {
     required this.value,
     required this.min,
     required this.max,
-    this.suffix = 'min',
+    this.suffix = 'dk',
     required this.onChanged,
   });
 
@@ -147,7 +354,7 @@ class _DurationTile extends StatelessWidget {
             onPressed: value > min ? () => onChanged(value - 1) : null,
           ),
           SizedBox(
-            width: 60,
+            width: 64,
             child: Text(
               '$value $suffix',
               textAlign: TextAlign.center,

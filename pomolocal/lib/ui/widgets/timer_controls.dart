@@ -58,7 +58,7 @@ class TimerControls extends StatelessWidget {
         return FilledButton.icon(
           onPressed: onStart,
           icon: const Icon(Icons.play_arrow_rounded, size: 32),
-          label: const Text('Start', style: TextStyle(fontSize: 18)),
+          label: const Text('Başla', style: TextStyle(fontSize: 18)),
           style: FilledButton.styleFrom(
             backgroundColor: color,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -68,7 +68,7 @@ class TimerControls extends StatelessWidget {
         return FilledButton.icon(
           onPressed: onPause,
           icon: const Icon(Icons.pause_rounded, size: 32),
-          label: const Text('Pause', style: TextStyle(fontSize: 18)),
+          label: const Text('Duraklat', style: TextStyle(fontSize: 18)),
           style: FilledButton.styleFrom(
             backgroundColor: color,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -78,7 +78,7 @@ class TimerControls extends StatelessWidget {
         return FilledButton.icon(
           onPressed: onResume,
           icon: const Icon(Icons.play_arrow_rounded, size: 32),
-          label: const Text('Resume', style: TextStyle(fontSize: 18)),
+          label: const Text('Devam', style: TextStyle(fontSize: 18)),
           style: FilledButton.styleFrom(
             backgroundColor: color,
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),

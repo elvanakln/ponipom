@@ -16,7 +16,7 @@ class AppConstants {
 
   // Strings
   static const String appName = 'PomoLocal';
-  static const String focusLabel = 'Focus';
-  static const String shortBreakLabel = 'Short Break';
-  static const String longBreakLabel = 'Long Break';
+  static const String focusLabel = 'Odaklan';
+  static const String shortBreakLabel = 'Kısa Mola';
+  static const String longBreakLabel = 'Uzun Mola';
 }

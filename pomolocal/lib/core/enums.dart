@@ -9,3 +9,9 @@ enum SessionType {
   shortBreak,
   longBreak,
 }
+
+enum TimerDisplayStyle {
+  circular,
+  calendar,
+  minimal,
+}

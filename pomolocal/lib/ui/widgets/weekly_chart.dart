@@ -7,7 +7,7 @@ class WeeklyChart extends StatelessWidget {
 
   const WeeklyChart({super.key, required this.weeklyData});
 
-  static const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static const _dayLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class WeeklyChart extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'This Week',
+              'Bu Hafta',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -40,7 +40,7 @@ class WeeklyChart extends StatelessWidget {
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         return BarTooltipItem(
-                          '${rod.toY.toInt()} min',
+                          '${rod.toY.toInt()} dk',
                           TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w500,
@@ -59,7 +59,7 @@ class WeeklyChart extends StatelessWidget {
                         reservedSize: 40,
                         getTitlesWidget: (value, meta) {
                           return Text(
-                            '${value.toInt()}m',
+                            '${value.toInt()}dk',
                             style: TextStyle(
                               fontSize: 11,
                               color: Theme.of(context).colorScheme.onSurfaceVariant,

@@ -20,16 +20,15 @@ class StatsScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 8),
                 Text(
-                  'Statistics',
+                  'İstatistikler',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
                 const SizedBox(height: 24),
 
-                // Today stats
                 Text(
-                  'Today',
+                  'Bugün',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -39,9 +38,9 @@ class StatsScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: StatCard(
-                        title: 'Sessions',
+                        title: 'Oturumlar',
                         value: '${stats.todayFocusCount}',
-                        subtitle: 'focus sessions completed',
+                        subtitle: 'tamamlanan odak oturumu',
                         icon: Icons.local_fire_department_rounded,
                         color: AppConstants.focusColor,
                       ),
@@ -49,9 +48,9 @@ class StatsScreen extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: StatCard(
-                        title: 'Minutes',
+                        title: 'Dakika',
                         value: '${stats.todayFocusMinutes}',
-                        subtitle: 'minutes of focus',
+                        subtitle: 'dakika odaklanma',
                         icon: Icons.schedule_rounded,
                         color: AppConstants.longBreakColor,
                       ),
@@ -61,9 +60,8 @@ class StatsScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // Week stats
                 Text(
-                  'This Week',
+                  'Bu Hafta',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -73,9 +71,9 @@ class StatsScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: StatCard(
-                        title: 'Sessions',
+                        title: 'Oturumlar',
                         value: '${stats.weekFocusCount}',
-                        subtitle: 'total this week',
+                        subtitle: 'haftalık toplam',
                         icon: Icons.emoji_events_rounded,
                         color: AppConstants.shortBreakColor,
                       ),
@@ -83,9 +81,9 @@ class StatsScreen extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: StatCard(
-                        title: 'Minutes',
+                        title: 'Dakika',
                         value: '${stats.weekFocusMinutes}',
-                        subtitle: 'total this week',
+                        subtitle: 'haftalık toplam',
                         icon: Icons.timer_rounded,
                         color: Colors.deepPurple,
                       ),
@@ -95,7 +93,6 @@ class StatsScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // Weekly chart
                 WeeklyChart(weeklyData: stats.weeklyBreakdown),
               ],
             ),
